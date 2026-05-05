@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/businesses")
@@ -55,5 +56,42 @@ public class BusinessController {
     @PatchMapping("/{id}")
     public Business update(@PathVariable String id, @RequestBody Business updates) {
         return businessService.update(id, updates);
+    }
+
+    @GetMapping("/mine")
+    public Business getMyBusiness(Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        return businessService.findByOwner(userId);
+    }
+
+    @PatchMapping("/mine")
+    public Business updateMyBusiness(@RequestBody Business updates, Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        Business mine = businessService.findByOwner(userId);
+        return businessService.update(mine.getId(), updates);
+    }
+
+    @PutMapping("/mine/menu")
+    public Business updateMenu(@RequestBody List<Business.MenuItem> items, Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        return businessService.updateMenu(userId, items);
+    }
+
+    @PutMapping("/mine/promo")
+    public Business updatePromo(@RequestBody Business.Promo promo, Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        return businessService.updatePromo(userId, promo);
+    }
+
+    @DeleteMapping("/mine/promo")
+    public Business deletePromo(Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        return businessService.removePromo(userId);
+    }
+
+    @GetMapping("/mine/analytics")
+    public Map<String, Object> getAnalytics(Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        return businessService.getAnalytics(userId);
     }
 }

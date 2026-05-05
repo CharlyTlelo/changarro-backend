@@ -2,6 +2,7 @@ package com.changarro.controller;
 
 import com.changarro.dto.AuthResponse;
 import com.changarro.dto.LoginRequest;
+import com.changarro.dto.RegisterBusinessRequest;
 import com.changarro.dto.RegisterRequest;
 import com.changarro.service.AuthService;
 import jakarta.validation.Valid;
@@ -22,6 +23,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/register-business")
+    public ResponseEntity<AuthResponse> registerBusiness(@Valid @RequestBody RegisterBusinessRequest request) {
+        AuthResponse response = authService.registerBusiness(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
