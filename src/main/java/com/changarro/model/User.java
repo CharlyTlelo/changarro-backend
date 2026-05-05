@@ -25,6 +25,8 @@ public class User {
 
     private String avatarEmoji = "😊";
 
+    private String role = "USER"; // USER or BUSINESS
+
     private int coins = 100;       // start with 100 welcome coins
     private int level = 1;         // Explorador
     private String levelName = "Explorador";
@@ -89,6 +91,9 @@ public class User {
 
     public List<String> getRedeemedRewardIds() { return redeemedRewardIds; }
     public void setRedeemedRewardIds(List<String> redeemedRewardIds) { this.redeemedRewardIds = redeemedRewardIds; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }

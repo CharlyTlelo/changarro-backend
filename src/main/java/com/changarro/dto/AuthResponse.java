@@ -5,6 +5,8 @@ public record AuthResponse(
     String userId,
     String name,
     String email,
+    String role,
+    String businessId,
     int coins,
     int level,
     String levelName
