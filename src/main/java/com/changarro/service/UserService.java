@@ -1,5 +1,6 @@
 package com.changarro.service;
 
+import com.changarro.dto.UpdateProfileRequest;
 import com.changarro.dto.UserProfile;
 import com.changarro.model.User;
 import com.changarro.repository.ReviewRepository;
@@ -24,12 +25,37 @@ public class UserService {
         long reviewCount = reviewRepository.findByUserId(userId).size();
 
         return new UserProfile(
-                user.getId(), user.getName(), user.getEmail(), user.getAvatarEmoji(),
+                user.getId(), user.getName(), user.getEmail(), user.getPhone(),
+                user.getAvatarEmoji(),
                 user.getCoins(), user.getLevel(), user.getLevelName(), user.getXp(),
                 user.getVisitedIds().size(), user.getFavoriteIds().size(),
                 (int) reviewCount, user.getStampIds().size(),
                 user.getStampIds(), user.getFavoriteIds(), user.getVisitedIds()
         );
+    }
+
+    public UserProfile updateProfile(String userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        if (request.name() != null && !request.name().isBlank()) {
+            user.setName(request.name().trim());
+        }
+        if (request.phone() != null) {
+            user.setPhone(request.phone().isBlank() ? null : request.phone().trim());
+        }
+
+        userRepository.save(user);
+        return getProfile(userId);
+    }
+
+    public void deleteAccount(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        // Delete user's reviews
+        reviewRepository.findByUserId(userId).forEach(r -> reviewRepository.deleteById(r.getId()));
+        // Delete user
+        userRepository.delete(user);
     }
 
     public User toggleFavorite(String userId, String businessId) {

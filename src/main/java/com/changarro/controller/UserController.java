@@ -1,9 +1,12 @@
 package com.changarro.controller;
 
+import com.changarro.dto.UpdateProfileRequest;
 import com.changarro.dto.UserProfile;
 import com.changarro.model.Stamp;
 import com.changarro.repository.StampRepository;
 import com.changarro.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +29,19 @@ public class UserController {
     public UserProfile getProfile(Authentication auth) {
         String userId = (String) auth.getPrincipal();
         return userService.getProfile(userId);
+    }
+
+    @PatchMapping("/me")
+    public UserProfile updateProfile(@Valid @RequestBody UpdateProfileRequest request, Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        return userService.updateProfile(userId, request);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Map<String, String>> deleteAccount(Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        userService.deleteAccount(userId);
+        return ResponseEntity.ok(Map.of("message", "Cuenta eliminada exitosamente"));
     }
 
     @PostMapping("/me/favorites/{businessId}")

@@ -172,6 +172,7 @@ public class DataSeeder implements CommandLineRunner {
         user.setLevel(4);
         user.setLevelName("Embajadora");
         user.setXp(520);
+        user.setPhone("55 1234 5678");
         user.setAvatarEmoji("😊");
         user.setStampIds(List.of("taquero", "cafeicon", "bohemio", "mananero"));
         return userRepo.save(user);
