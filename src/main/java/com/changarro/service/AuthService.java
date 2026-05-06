@@ -98,4 +98,26 @@ public class AuthService {
                 user.getRole(), businessId,
                 user.getCoins(), user.getLevel(), user.getLevelName());
     }
+
+    public AuthResponse adminLogin(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("Correo o contrasena incorrectos"));
+
+        if (!"ADMIN".equals(user.getRole())) {
+            throw new IllegalArgumentException("Acceso denegado");
+        }
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new IllegalArgumentException("Correo o contrasena incorrectos");
+        }
+
+        user.setLastLogin(java.time.Instant.now());
+        userRepository.save(user);
+
+        String token = jwtService.generateToken(user.getId(), user.getEmail());
+
+        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(),
+                user.getRole(), null,
+                user.getCoins(), user.getLevel(), user.getLevelName());
+    }
 }
