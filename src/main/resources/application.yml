@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: Changarro
+
+  data:
+    mongodb:
+      uri: "mongodb+srv://carlostlelo4_db_user:Changarro2026!@changarro.xh8y0sn.mongodb.net/changarro_db?retryWrites=true&w=majority&appName=changarro"
+      database: changarro_db
+
+  security:
+    user:
+      name: ignored
+
+server:
+  port: 8080
+
+changarro:
+  jwt:
+    secret: Y2hhbmdhcnJvLXNlY3JldC1rZXktMjAyNi1sb2NhbC1kZXYtb25seS1ub3QtZm9yLXByb2R1Y3Rpb24=
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: "http://localhost:4200"
+  admin:
+    email: admin@changarro.local
+    password: Admin123!
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
