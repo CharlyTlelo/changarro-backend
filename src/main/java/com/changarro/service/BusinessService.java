@@ -74,6 +74,7 @@ public class BusinessService {
         if (updates.getPriceRange() != null) existing.setPriceRange(updates.getPriceRange());
         if (updates.getNeighborhood() != null) existing.setNeighborhood(updates.getNeighborhood());
         if (updates.getCategoryId() != null) existing.setCategoryId(updates.getCategoryId());
+        if (updates.getSubcategoryId() != null) existing.setSubcategoryId(updates.getSubcategoryId());
         if (updates.getEmoji() != null) existing.setEmoji(updates.getEmoji());
         if (updates.getColor() != null) existing.setColor(updates.getColor());
         if (updates.getTag() != null) existing.setTag(updates.getTag());

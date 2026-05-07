@@ -2,6 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { updateBusinessSchema, menuItemsArraySchema, promoSchema } from '../validators/business.validator';
 import * as bizService from '../services/business.service';
 
+export async function getPublicBusinesses(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const businesses = await bizService.getAllBusinesses();
+    res.json(businesses);
+  } catch (err) { next(err); }
+}
+
 export async function getMyBusiness(req: Request, res: Response, next: NextFunction) {
   try {
     const biz = await bizService.getMyBusiness(req.auth!.userId);

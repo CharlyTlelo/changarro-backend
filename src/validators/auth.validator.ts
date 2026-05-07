@@ -2,13 +2,14 @@ import { z } from 'zod';
 
 export const registerBusinessSchema = z.object({
   name: z.string().min(2, 'Nombre requerido'),
-  email: z.string().email('Email inválido'),
+  email: z.string().optional(),
+  whatsapp: z.string().min(8, 'WhatsApp requerido (mín 8 dígitos)').optional(),
   password: z.string().min(6, 'Contraseña mínimo 6 caracteres'),
   businessName: z.string().min(2, 'Nombre del negocio requerido'),
   phone: z.string().optional(),
   address: z.string().optional(),
   description: z.string().optional(),
-});
+}).refine(d => d.email || d.whatsapp, { message: 'Se requiere email o WhatsApp' });
 
 export const registerSchema = z.object({
   name: z.string().min(2, 'Nombre mínimo 2 caracteres').max(60, 'Nombre máximo 60 caracteres'),
@@ -17,6 +18,6 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.string().min(1, 'Email o teléfono requerido'),
   password: z.string().min(1, 'Contraseña requerida'),
 });

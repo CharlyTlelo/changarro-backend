@@ -4,6 +4,8 @@ import * as bizCtrl from '../controllers/business.controller';
 
 export const businessRouter = Router();
 
+businessRouter.get('/', bizCtrl.getPublicBusinesses);
+
 businessRouter.use(authMiddleware);
 
 businessRouter.get('/mine', bizCtrl.getMyBusiness);

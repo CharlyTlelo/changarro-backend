@@ -3,6 +3,7 @@ package com.changarro.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
+    @Field("passwordHash")
     private String password;
 
     private String phone;

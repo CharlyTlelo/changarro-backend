@@ -6,7 +6,8 @@ import { signToken } from '../utils/jwt.util';
 
 interface RegisterBusinessInput {
   name: string;
-  email: string;
+  email?: string;
+  whatsapp?: string;
   password: string;
   businessName: string;
   phone?: string;
@@ -35,14 +36,21 @@ function buildAuthResponse(user: IUser, businessId: string | null) {
 }
 
 export async function registerBusiness(input: RegisterBusinessInput) {
-  const existing = await User.findOne({ email: input.email });
-  if (existing) throw Object.assign(new Error('El email ya está registrado'), { status: 409 });
+  const identifier = input.email || input.whatsapp;
+  const existing = await User.findOne({
+    $or: [
+      ...(input.email ? [{ email: input.email }] : []),
+      ...(input.whatsapp ? [{ whatsapp: input.whatsapp }] : []),
+    ],
+  });
+  if (existing) throw Object.assign(new Error('Este email o WhatsApp ya está registrado'), { status: 409 });
 
   const passwordHash = await bcrypt.hash(input.password, 10);
   const user = await User.create({
     name: input.name,
-    email: input.email,
-    phone: input.phone,
+    email: input.email || undefined,
+    whatsapp: input.whatsapp || undefined,
+    phone: input.phone || input.whatsapp || '',
     passwordHash,
     role: 'BUSINESS',
   });
@@ -82,8 +90,14 @@ export async function registerUser(input: RegisterInput) {
   return buildAuthResponse(user, null);
 }
 
-export async function login(email: string, password: string) {
-  const user = await User.findOne({ email });
+export async function login(identifier: string, password: string) {
+  const user = await User.findOne({
+    $or: [
+      { email: identifier },
+      { phone: identifier },
+      { whatsapp: identifier },
+    ],
+  });
   if (!user) throw Object.assign(new Error('Credenciales inválidas'), { status: 401 });
 
   const valid = await bcrypt.compare(password, user.passwordHash);
