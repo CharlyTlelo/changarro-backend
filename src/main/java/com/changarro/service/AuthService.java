@@ -31,11 +31,21 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("El correo ya esta registrado");
+        String whatsapp = firstNotBlank(request.whatsapp(), request.phone());
+        if (isBlank(request.name()) || isBlank(whatsapp) || isBlank(request.password())) {
+            throw new IllegalArgumentException("Nombre, WhatsApp y contrasena son requeridos");
         }
 
-        User user = new User(request.name(), request.email(), passwordEncoder.encode(request.password()));
+        String normalizedEmail = normalizeEmail(request.email());
+        String normalizedWhatsapp = normalizePhone(whatsapp);
+        String storageEmail = normalizedEmail != null ? normalizedEmail : normalizedWhatsapp + "@whatsapp.local";
+
+        if (userRepository.existsByEmail(storageEmail) || userRepository.existsByPhone(normalizedWhatsapp)) {
+            throw new IllegalArgumentException("Este WhatsApp ya esta registrado");
+        }
+
+        User user = new User(request.name().trim(), storageEmail, passwordEncoder.encode(request.password()));
+        user.setPhone(normalizedWhatsapp);
         user.setCoins(100);
         user = userRepository.save(user);
 
@@ -47,21 +57,32 @@ public class AuthService {
     }
 
     public AuthResponse registerBusiness(RegisterBusinessRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("El correo ya esta registrado");
+        String whatsapp = firstNotBlank(request.whatsapp(), request.phone());
+        if (isBlank(request.name()) || isBlank(request.businessName()) || isBlank(request.password()) || isBlank(whatsapp)) {
+            throw new IllegalArgumentException("Nombre, WhatsApp, contrasena y negocio son requeridos");
         }
 
-        User user = new User(request.name(), request.email(), passwordEncoder.encode(request.password()));
+        String normalizedEmail = normalizeEmail(request.email());
+        String normalizedWhatsapp = normalizePhone(whatsapp);
+        String storageEmail = normalizedEmail != null ? normalizedEmail : normalizedWhatsapp + "@whatsapp.local";
+
+        if (userRepository.existsByEmail(storageEmail) || userRepository.existsByPhone(normalizedWhatsapp)) {
+            throw new IllegalArgumentException("Este WhatsApp ya esta registrado");
+        }
+
+        User user = new User(request.name().trim(), storageEmail, passwordEncoder.encode(request.password()));
         user.setRole("BUSINESS");
-        user.setPhone(request.phone());
+        user.setPhone(normalizedWhatsapp);
         user.setCoins(0);
         user = userRepository.save(user);
 
         Business business = new Business();
-        business.setName(request.businessName());
-        business.setPhone(request.phone());
+        business.setName(request.businessName().trim());
+        business.setPhone(normalizedWhatsapp);
         business.setAddress(request.address());
         business.setDescription(request.description());
+        business.setCategoryId(request.categoryId());
+        business.setSubcategoryId(request.subcategoryId());
         business.setOwnerId(user.getId());
         business.setNuevo(true);
         business = businessRepository.save(business);
@@ -74,11 +95,12 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Correo o contrasena incorrectos"));
+        String identifier = request.email().trim();
+        User user = findByIdentifier(identifier)
+                .orElseThrow(() -> new IllegalArgumentException("WhatsApp o contrasena incorrectos"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new IllegalArgumentException("Correo o contrasena incorrectos");
+            throw new IllegalArgumentException("WhatsApp o contrasena incorrectos");
         }
 
         user.setLastLogin(java.time.Instant.now());
@@ -100,7 +122,7 @@ public class AuthService {
     }
 
     public AuthResponse adminLogin(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmail(normalizeEmail(request.email()))
                 .orElseThrow(() -> new IllegalArgumentException("Correo o contrasena incorrectos"));
 
         if (!"ADMIN".equals(user.getRole())) {
@@ -119,5 +141,39 @@ public class AuthService {
         return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(),
                 user.getRole(), null,
                 user.getCoins(), user.getLevel(), user.getLevelName());
+    }
+
+    private java.util.Optional<User> findByIdentifier(String rawIdentifier) {
+        if (rawIdentifier.contains("@")) {
+            return userRepository.findByEmail(normalizeEmail(rawIdentifier));
+        }
+
+        String normalizedPhone = normalizePhone(rawIdentifier);
+        return userRepository.findByPhone(normalizedPhone)
+                .or(() -> userRepository.findByPhone(rawIdentifier.trim()))
+                .or(() -> userRepository.findByEmail(normalizedPhone + "@whatsapp.local"))
+                .or(() -> userRepository.findAll().stream()
+                        .filter(user -> normalizePhone(user.getPhone()).equals(normalizedPhone))
+                        .findFirst());
+    }
+
+    private String normalizeEmail(String value) {
+        if (isBlank(value)) return null;
+        return value.trim().toLowerCase();
+    }
+
+    private String normalizePhone(String value) {
+        if (value == null) return "";
+        return value.replaceAll("\\D", "");
+    }
+
+    private String firstNotBlank(String first, String second) {
+        if (!isBlank(first)) return first.trim();
+        if (!isBlank(second)) return second.trim();
+        return "";
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

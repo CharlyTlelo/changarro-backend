@@ -90,7 +90,11 @@ export async function getAnalytics(userId: string) {
 }
 
 export async function getAllBusinesses() {
-  return Business.find().lean();
+  return Business.find()
+    .select('name categoryId description address neighborhood rating reviewCount emoji color tags tag activePromo trending nuevo createdAt')
+    .sort({ trending: -1, nuevo: -1, createdAt: -1 })
+    .limit(80)
+    .lean();
 }
 
 export async function getBusinessById(id: string) {

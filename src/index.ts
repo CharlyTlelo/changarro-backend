@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import { authRouter } from './routes/auth.routes';
 import { businessRouter } from './routes/business.routes';
 import { adminRouter } from './routes/admin.routes';
+import { userRouter } from './routes/user.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json({ limit: '5mb' }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/businesses', businessRouter);
+app.use('/api/users', userRouter);
 app.use('/api/admin', adminRouter);
 
 app.get('/api/health', (_req, res) => {

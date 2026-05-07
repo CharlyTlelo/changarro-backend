@@ -3,6 +3,9 @@ package com.changarro.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Document(collection = "categories")
 public class Category {
 
@@ -14,6 +17,30 @@ public class Category {
     private String color;
     private String bg;
     private int businessCount;
+    private List<Subcategory> subcategories = new ArrayList<>();
+
+    public static class Subcategory {
+        private String id;
+        private String label;
+        private String emoji;
+
+        public Subcategory() {}
+
+        public Subcategory(String id, String label, String emoji) {
+            this.id = id;
+            this.label = label;
+            this.emoji = emoji;
+        }
+
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; }
+
+        public String getLabel() { return label; }
+        public void setLabel(String label) { this.label = label; }
+
+        public String getEmoji() { return emoji; }
+        public void setEmoji(String emoji) { this.emoji = emoji; }
+    }
 
     public Category() {}
 
@@ -42,4 +69,7 @@ public class Category {
 
     public int getBusinessCount() { return businessCount; }
     public void setBusinessCount(int businessCount) { this.businessCount = businessCount; }
+
+    public List<Subcategory> getSubcategories() { return subcategories; }
+    public void setSubcategories(List<Subcategory> subcategories) { this.subcategories = subcategories; }
 }

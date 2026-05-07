@@ -1,14 +1,16 @@
 package com.changarro.dto;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record RegisterBusinessRequest(
-    @NotBlank String name,
-    @NotBlank @Email String email,
-    @NotBlank @Size(min = 6) String password,
-    @NotBlank String businessName,
+    String name,
+    @Email String email,
+    String whatsapp,
+    @Size(min = 6) String password,
+    String businessName,
+    String categoryId,
+    String subcategoryId,
     String phone,
     String address,
     String description

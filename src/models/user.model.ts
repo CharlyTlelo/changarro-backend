@@ -4,6 +4,7 @@ export interface IUser extends Document {
   email?: string;
   whatsapp?: string;
   phone?: string;
+  profilePhotoUrl?: string;
   name: string;
   passwordHash: string;
   role: 'USER' | 'BUSINESS' | 'CUSTOMER' | 'ADMIN';
@@ -18,6 +19,7 @@ const userSchema = new Schema<IUser>({
   email: { type: String, unique: true, sparse: true, index: true, lowercase: true, trim: true },
   whatsapp: { type: String, sparse: true },
   phone: { type: String },
+  profilePhotoUrl: { type: String, default: '' },
   name: { type: String, required: true, trim: true },
   passwordHash: { type: String, required: true },
   role: { type: String, enum: ['USER', 'BUSINESS', 'CUSTOMER', 'ADMIN'], default: 'USER' },

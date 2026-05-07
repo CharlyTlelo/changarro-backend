@@ -14,6 +14,7 @@ public class Business {
 
     private String name;
     private String categoryId;       // references Category.id
+    private String subcategoryId;    // references Category.subcategories.id
     private String description;
     private String address;
     private String neighborhood;     // e.g. "Roma Norte"
@@ -98,6 +99,9 @@ public class Business {
 
     public String getCategoryId() { return categoryId; }
     public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
+
+    public String getSubcategoryId() { return subcategoryId; }
+    public void setSubcategoryId(String subcategoryId) { this.subcategoryId = subcategoryId; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
